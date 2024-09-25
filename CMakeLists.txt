@@ -4,23 +4,43 @@ project(FiniteAutomata)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_subdirectory(src)
 
 include(FetchContent)
+
+# install fmt
+find_package(fmt)
+IF (NOT fmt_FOUND)
+    message("fmt not found locally, installing from github...")
+
+    FetchContent_Declare(
+            fmt
+            GIT_REPOSITORY https://github.com/fmtlib/fmt
+            GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281) # 10.2.1
+    FetchContent_MakeAvailable(fmt)
+ENDIF ()
+
+# install GTEST
 FetchContent_Declare(
         googletest
         URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
 FetchContent_MakeAvailable(googletest)
-
-# testing
 enable_testing()
 
+# testing target
 add_executable(
         Tests
+        tests/unit/regex/RegexParserTests.cpp
+        tests/unit/regex/RegexParserTestCase.h
+        tests/unit/finite_automata/FiniteAutomataRegexTests.cpp
 )
-target_link_libraries(Tests GTest::gtest_main)
+
+target_link_libraries(Tests GTest::gtest_main fmt::fmt FiniteAutomata)
 include(GoogleTest)
 gtest_discover_tests(Tests)
 
 
-add_executable(FiniteAutomata main.cpp)
+# just example target
+add_executable(Example main.cpp)
+target_link_libraries(Example fmt::fmt FiniteAutomata)
