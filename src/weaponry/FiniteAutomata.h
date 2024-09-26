@@ -12,16 +12,16 @@
 
 #include "RegexNodes.h"
 
-constexpr size_t cLettersCount = 27;
-
 class FiniteAutomata {
   struct FiniteAutomataBuilderVisitor;
 
+ public:
   struct Node {
     bool is_final{false};
     std::unordered_multimap<char, Node*> jumps;
   };
 
+ private:
   std::list<Node> nodes_;
 
   template <typename T>
@@ -41,6 +41,8 @@ class FiniteAutomata {
       }
     }
   }
+
+  void remove_unreachable_nodes();
 
  public:
   static constexpr char cEmptyChar = ' ';
@@ -67,4 +69,22 @@ class FiniteAutomata {
   size_t size() const { return nodes_.size(); }
 
   const std::list<Node>& get_nodes() const { return nodes_; }
+
+  template <typename T>
+    requires(std::same_as<T, const Node*> || std::same_as<T, Node*>)
+  static void do_jumps(std::unordered_set<T>& nodes, char letter) {
+    do_empty_jumps(nodes);
+
+    std::unordered_set<T> next_nodes;
+    for (const Node* node : nodes) {
+      auto [beg, end] = node->jumps.equal_range(letter);
+
+      for (; beg != end; ++beg) {
+        next_nodes.insert(beg->second);
+      }
+    }
+
+    do_empty_jumps(next_nodes);
+    nodes = std::move(next_nodes);
+  }
 };

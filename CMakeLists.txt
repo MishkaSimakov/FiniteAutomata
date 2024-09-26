@@ -3,8 +3,7 @@ project(FiniteAutomata)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-add_subdirectory(src)
+set(CMAKE_CXX_FLAGS "-fsanitize=address")
 
 include(FetchContent)
 
@@ -28,6 +27,8 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 enable_testing()
 
+add_subdirectory(src)
+
 # testing target
 add_executable(
         Tests
@@ -36,11 +37,11 @@ add_executable(
         tests/unit/finite_automata/FiniteAutomataRegexTests.cpp
 )
 
-target_link_libraries(Tests GTest::gtest_main fmt::fmt FiniteAutomata)
+target_link_libraries(Tests GTest::gtest_main FiniteAutomata)
 include(GoogleTest)
 gtest_discover_tests(Tests)
 
 
 # just example target
 add_executable(Example main.cpp)
-target_link_libraries(Example fmt::fmt FiniteAutomata)
+target_link_libraries(Example FiniteAutomata)

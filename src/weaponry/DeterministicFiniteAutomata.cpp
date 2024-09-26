@@ -2,24 +2,27 @@
 
 #include <queue>
 
-DeterministicFiniteAutomata::DeterministicFiniteAutomata(
-    const FiniteAutomata& finite_automata) {
-  using PairT = std::pair<const std::vector<bool>, Node*>;
+#include "converters/NonDeterministicToDeterministic.h"
 
-  std::vector<Node> other_nodes(finite_automata.get_nodes().begin(), finite_automata.get_nodes().end());
+DeterministicFiniteAutomata::DeterministicFiniteAutomata() {
+  nodes.emplace_back();
 
-  std::vector current_states(finite_automata.size(), false);
-  current_states[0] = true;
-
-  Node& start = nodes_.emplace_back();
-  nodes.emplace(std::move(current_states), &start);
-
-  std::queue<std::reference_wrapper<PairT>> queue;
-  queue.emplace(*nodes.begin());
-
-  while (!queue.empty()) {
-    auto& [current_states, node_ptr] = queue.front().get();
-
-
+  for (size_t& jump : nodes.front().jumps) {
+    jump = 0;
   }
+}
+
+DeterministicFiniteAutomata::DeterministicFiniteAutomata(
+    const FiniteAutomata& finite_automata)
+    : nodes(Converters::NonDeterministicToDeterministic()
+                .convert(finite_automata)
+                .nodes) {}
+
+bool DeterministicFiniteAutomata::contains(std::string_view word) {
+  size_t state = 0;
+  for (char symbol : word) {
+    state = nodes[state].jumps[Charset::get_index(symbol)];
+  }
+
+  return nodes[state].is_final;
 }

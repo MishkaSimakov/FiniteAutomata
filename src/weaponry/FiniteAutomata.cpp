@@ -1,6 +1,7 @@
 #include "FiniteAutomata.h"
 
 #include <algorithm>
+#include <queue>
 
 struct FiniteAutomata::FiniteAutomataBuilderVisitor final : RegexNodeVisitor {
   FiniteAutomata result;
@@ -75,6 +76,35 @@ struct FiniteAutomata::FiniteAutomataBuilderVisitor final : RegexNodeVisitor {
   }
 };
 
+void FiniteAutomata::remove_unreachable_nodes() {
+  std::unordered_set<const Node*> visited;
+  std::queue<const Node*> queue;
+
+  visited.insert(&nodes_.front());
+  queue.push(&nodes_.front());
+
+  while (!queue.empty()) {
+    const Node* current = queue.front();
+    queue.pop();
+
+    for (const Node* next : current->jumps | std::views::values) {
+      auto [itr, was_inserted] = visited.insert(next);
+
+      if (was_inserted) {
+        queue.push(next);
+      }
+    }
+  }
+
+  for (auto itr = nodes_.begin(); itr != nodes_.end();) {
+    if (visited.contains(&*itr)) {
+      ++itr;
+    } else {
+      itr = nodes_.erase(itr);
+    }
+  }
+}
+
 FiniteAutomata::FiniteAutomata(RegexNode& regex) {
   FiniteAutomataBuilderVisitor visitor;
   regex.accept(visitor);
@@ -122,6 +152,10 @@ void FiniteAutomata::remove_empty_jumps() {
     // add appropriate jumps
     std::vector<std::pair<char, Node*>> additional_jumps;
     for (const Node* reachable_by_empty_jump : nodes) {
+      if (reachable_by_empty_jump->is_final) {
+        node.is_final = true;
+      }
+
       for (const auto& [symbol, dest] : reachable_by_empty_jump->jumps) {
         if (symbol != cEmptyChar) {
           additional_jumps.emplace_back(symbol, dest);
@@ -136,4 +170,6 @@ void FiniteAutomata::remove_empty_jumps() {
     // remove all empty jumps from node
     node.jumps.erase(cEmptyChar);
   }
+
+  remove_unreachable_nodes();
 }
