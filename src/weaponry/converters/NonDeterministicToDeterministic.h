@@ -13,16 +13,27 @@ DeterministicFiniteAutomata<Charset>::DeterministicFiniteAutomata(
   std::vector<NDNodeCref> old_nodes(old_nodes_list.begin(),
                                     old_nodes_list.end());
 
-  std::vector start_state(automata.size(), false);
-  start_state[0] = true;
-
-  std::unordered_map<std::vector<bool>, size_t> old_to_new;
+  std::unordered_set<const NDNode*> start_nodes;
+  start_nodes.insert(&automata.get_nodes().front());
+  FiniteAutomata<Charset>::do_empty_jumps(start_nodes);
 
   // add new start node
   DNode& start = nodes.emplace_back();
-  start.is_final = automata.get_nodes().front().is_final;
-  start.old_indices.insert(0);
 
+  std::vector start_state(automata.size(), false);
+  for (size_t i = 0; i < start_state.size(); ++i) {
+    const NDNode* current_node = &old_nodes[i].get();
+    if (start_nodes.contains(current_node)) {
+      start_state[i] = true;
+      start.old_indices.insert(i);
+
+      if (current_node->is_final) {
+        start.is_final = true;
+      }
+    }
+  }
+
+  std::unordered_map<std::vector<bool>, size_t> old_to_new;
   old_to_new.emplace(start_state, 0);
 
   std::queue<std::vector<bool>> queue;

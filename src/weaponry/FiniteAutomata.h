@@ -98,24 +98,6 @@ class FiniteAutomata {
  private:
   std::list<Node> nodes_;
 
-  template <typename T>
-    requires(std::same_as<T, const Node*> || std::same_as<T, Node*>)
-  static void do_empty_jumps(std::unordered_set<T>& nodes) {
-    std::list<const Node*> unprocessed;
-    std::copy(nodes.begin(), nodes.end(), std::back_inserter(unprocessed));
-    while (!unprocessed.empty()) {
-      const Node* current = unprocessed.front();
-      unprocessed.pop_front();
-
-      for (const auto& [symbol, next] : current->jumps) {
-        if (symbol == cEmptyChar && !nodes.contains(next)) {
-          nodes.insert(next);
-          unprocessed.push_back(next);
-        }
-      }
-    }
-  }
-
   void remove_unreachable_nodes();
 
  public:
@@ -193,5 +175,23 @@ class FiniteAutomata {
 
     do_empty_jumps(next_nodes);
     nodes = std::move(next_nodes);
+  }
+
+  template <typename T>
+    requires(std::same_as<T, const Node*> || std::same_as<T, Node*>)
+  static void do_empty_jumps(std::unordered_set<T>& nodes) {
+    std::list<const Node*> unprocessed;
+    std::copy(nodes.begin(), nodes.end(), std::back_inserter(unprocessed));
+    while (!unprocessed.empty()) {
+      const Node* current = unprocessed.front();
+      unprocessed.pop_front();
+
+      for (const auto& [symbol, next] : current->jumps) {
+        if (symbol == cEmptyChar && !nodes.contains(next)) {
+          nodes.insert(next);
+          unprocessed.push_back(next);
+        }
+      }
+    }
   }
 };
