@@ -30,20 +30,7 @@ enable_testing()
 add_subdirectory(src)
 
 # testing target
-add_executable(
-        Tests
-        tests/unit/regex/RegexParserTests.cpp
-        tests/unit/regex/RegexParserTestCase.h
-        tests/unit/finite_automata/FiniteAutomataRegexTests.cpp
-        tests/unit/finite_automata/NonDeterministicToDeterministicTests.cpp
-        tests/unit/finite_automata/RegexStrings.h
-        tests/unit/finite_automata/RegexStrings.cpp
-)
-
-target_link_libraries(Tests GTest::gtest_main FiniteAutomata)
-include(GoogleTest)
-gtest_discover_tests(Tests)
-
+add_subdirectory(tests)
 
 # just example target
 add_executable(Example main.cpp)
