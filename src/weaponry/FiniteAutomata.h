@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <concepts>
 #include <deque>
@@ -10,10 +11,83 @@
 #include <unordered_set>
 #include <vector>
 
-#include "RegexNodes.h"
+#include "CharsetInfo.h"
+#include "CustomRegex.h"
 
+template <typename Charset = CharsetInfo>
 class FiniteAutomata {
-  struct FiniteAutomataBuilderVisitor;
+  struct FiniteAutomataBuilderVisitor final : RegexNodeVisitor {
+    FiniteAutomata result;
+
+    void visit(const SymbolNode& node) override {
+      auto& start_node = result.get_start_node();
+      auto& end_node = result.add_node();
+
+      start_node.jumps.emplace(node.symbol, &end_node);
+      end_node.is_final = true;
+    }
+
+    void visit(const ZeroNode& node) override {}
+    void visit(const OneNode& node) override {
+      auto& start_node = result.get_start_node();
+      auto& end_node = result.add_node();
+
+      start_node.jumps.emplace(cEmptyChar, &end_node);
+      end_node.is_final = true;
+    }
+
+    void visit(const ConcatenationNode& node) override {
+      FiniteAutomata concatenated;
+
+      node.left->accept(*this);
+
+      std::swap(concatenated, result);
+
+      node.right->accept(*this);
+
+      for (Node& final_node : concatenated.get_final_nodes()) {
+        final_node.is_final = false;
+        final_node.jumps.emplace(cEmptyChar, &result.get_start_node());
+      }
+
+      result.nodes_.splice(result.nodes_.begin(), concatenated.nodes_);
+    }
+
+    void visit(const OrNode& node) override {
+      FiniteAutomata concatenated;
+
+      node.left->accept(*this);
+
+      std::swap(concatenated, result);
+
+      node.right->accept(*this);
+
+      Node& left_front = concatenated.get_start_node();
+      Node& right_front = result.get_start_node();
+
+      Node& front = result.nodes_.emplace_front();
+      front.jumps.emplace(cEmptyChar, &left_front);
+      front.jumps.emplace(cEmptyChar, &right_front);
+
+      result.nodes_.splice(result.nodes_.end(), concatenated.nodes_);
+    }
+
+    void visit(const StarNode& node) override {
+      node.child->accept(*this);
+
+      auto& old_front = result.get_start_node();
+      auto& front = result.nodes_.emplace_front();
+
+      front.jumps.emplace(cEmptyChar, &old_front);
+
+      for (auto& final_node : result.get_final_nodes()) {
+        final_node.is_final = false;
+        final_node.jumps.emplace(cEmptyChar, &front);
+      }
+
+      front.is_final = true;
+    }
+  };
 
  public:
   struct Node {
@@ -52,7 +126,12 @@ class FiniteAutomata {
     nodes_.emplace_back();
   }
 
-  explicit FiniteAutomata(RegexNode& regex);
+  explicit FiniteAutomata(const Regex& regex) {
+    FiniteAutomataBuilderVisitor visitor;
+    regex.get_root().accept(visitor);
+
+    *this = std::move(visitor.result);
+  }
 
   Node& get_start_node() { return nodes_.front(); }
   Node& add_node() { return nodes_.emplace_back(); }
@@ -62,7 +141,35 @@ class FiniteAutomata {
            std::views::filter([](const Node& node) { return node.is_final; });
   }
 
-  bool containts_word(std::string_view word) const;
+  bool containts_word(std::string_view word) const {
+    std::unordered_set<const Node*> current;
+    current.insert(&nodes_.front());
+
+    while (!word.empty()) {
+      char current_letter = word.front();
+
+      // jump by edges with empty letter
+      do_empty_jumps(current);
+
+      // do non-empty jumps
+      std::unordered_set<const Node*> new_current;
+      for (const Node* node : current) {
+        auto [begin, end] = node->jumps.equal_range(current_letter);
+
+        for (; begin != end; ++begin) {
+          new_current.insert(begin->second);
+        }
+      }
+
+      current = std::move(new_current);
+      word.remove_prefix(1);
+    }
+
+    do_empty_jumps(current);
+
+    return std::ranges::any_of(current,
+                               [](const Node* node) { return node->is_final; });
+  }
 
   void remove_empty_jumps();
 

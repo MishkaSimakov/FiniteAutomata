@@ -8,7 +8,10 @@ class Regex {
   std::unique_ptr<RegexNode> root_;
 
  public:
-  explicit Regex(std::string_view string) : root_(RegexParser::parse(string)) {}
+  explicit Regex(std::string_view string)
+      : root_(RegexParser::parse(string)) {}
+
+  const RegexNode& get_root() const { return *root_; }
 
   Regex(const Regex& other) : root_(other.root_->clone()) {}
   Regex(Regex&& other) = default;

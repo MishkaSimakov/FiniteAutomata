@@ -35,6 +35,9 @@ add_executable(
         tests/unit/regex/RegexParserTests.cpp
         tests/unit/regex/RegexParserTestCase.h
         tests/unit/finite_automata/FiniteAutomataRegexTests.cpp
+        tests/unit/finite_automata/NonDeterministicToDeterministicTests.cpp
+        tests/unit/finite_automata/RegexStrings.h
+        tests/unit/finite_automata/RegexStrings.cpp
 )
 
 target_link_libraries(Tests GTest::gtest_main FiniteAutomata)

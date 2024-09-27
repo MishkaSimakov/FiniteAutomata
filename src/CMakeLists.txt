@@ -6,15 +6,12 @@ add_library(FiniteAutomata
         regex/RegexNodes.h
         regex/RegexPrinter.cpp
         regex/RegexPrinter.h
-        weaponry/DeterministicFiniteAutomata.cpp
         weaponry/DeterministicFiniteAutomata.h
-        regex/Regex.h
-        regex/Regex.h
+        regex/CustomRegex.h
+        regex/CustomRegex.h
         weaponry/CharsetInfo.h
         weaponry/CharsetInfo.h
-        weaponry/converters/NonDeterministicToDeterministic.cpp
         weaponry/converters/NonDeterministicToDeterministic.h
-        weaponry/FiniteAutomataPrinter.cpp
         weaponry/FiniteAutomataPrinter.h
 )
 

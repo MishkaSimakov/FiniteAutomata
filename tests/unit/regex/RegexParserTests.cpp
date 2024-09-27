@@ -5,7 +5,7 @@
 #include "RegexParserTestCase.h"
 #include "regex/RegexParser.h"
 
-TEST_F(RegexParserTestCase, TestItParseSimpleConcatenation) {
+TEST_F(RegexParserTestCase, test_it_parse_simple_concatenation) {
   std::vector<std::string> regexes = {"abc(d)ef", "(a)",          "a",
                                       "a(b)",     "ab(cdefg)hjk", "abcdefg",
                                       "abcd(e)",  "(a)b  cdefg"};
@@ -21,7 +21,7 @@ TEST_F(RegexParserTestCase, TestItParseSimpleConcatenation) {
   }
 }
 
-TEST_F(RegexParserTestCase, TestItParseSimpleOrExpression) {
+TEST_F(RegexParserTestCase, test_it_parse_simple_or_expression) {
   std::string regex = "abc | bca";
 
   auto result = RegexParser::parse(regex);
@@ -44,7 +44,7 @@ TEST_F(RegexParserTestCase, TestItParseSimpleOrExpression) {
   }
 }
 
-TEST_F(RegexParserTestCase, TestItParseStar) {
+TEST_F(RegexParserTestCase, test_it_parse_star) {
   {
     auto result = RegexParser::parse("(a)*");
 

@@ -30,7 +30,7 @@ struct RegexPrinterVisitor : RegexNodeVisitor {
 };
 }  // namespace
 
-RegexPrinter::RegexPrinter(const RegexNode& node) : node_(node) {}
+RegexPrinter::RegexPrinter(const Regex& regex) : regex_(regex) {}
 
 std::ostream& operator<<(std::ostream& os, const RegexPrinter& printer) {
   auto print_visitor = RegexPrinterVisitor(os);
