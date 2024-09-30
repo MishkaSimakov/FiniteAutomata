@@ -7,9 +7,9 @@ const auto regex_strings = [] {
 
   // clang-format off
   result.emplace_back(
-      Regex("abcd"),
-      std::vector{"abcd"},
-      std::vector{"", "abc", "a", "abcde"});
+      Regex("abab"),
+      std::vector{"abab"},
+      std::vector{"", "ab", "a", "abbbb", "abbb", "abaa"});
 
   result.emplace_back(
       Regex("(a)*"),
@@ -17,14 +17,9 @@ const auto regex_strings = [] {
       std::vector{"b", "aaaaaaaaaab", "ab", "ba", "bbbbb", "bbbaaa"});
 
   result.emplace_back(
-      Regex("(a | b)*abc"),
-      std::vector{"abc", "aaaaaaabc", "bbbbabc", "abababbaabbbababababc"},
-      std::vector{"bc", "aaaaaaaac", "aaaaaabbc", "", "ab", "abbc", "abccc", "ccabc", "aaacaaabc"});
-
-  result.emplace_back(
-      Regex("((b | c)*a(b | c)*a)*(b | c)*"),
-      std::vector{"aaaa", "abccccbbbcba", "", "bbbbcccccbbb", "bcbcbcbaaaa", "aabcbcbcbcbcbbb"},
-      std::vector{"aaa", "a", "bcbcbcbcabcbcbcbc", "aadaa", "bcbcbcbcba"});
+      Regex("(a + b)*ab"),
+      std::vector{"ab", "aaaaaaab", "bbbbab", "abababbaabbbabababab"},
+      std::vector{"bb", "aaaaaaaabb", "aaaaaabba", "", "a", "b", "abb", "aba", "aaa"});
 
   // clang-format on
 

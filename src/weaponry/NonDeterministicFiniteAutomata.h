@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "CharsetInfo.h"
+#include "../CharsetInfo.h"
 #include "CustomRegex.h"
 
 class NonDeterministicFiniteAutomata {

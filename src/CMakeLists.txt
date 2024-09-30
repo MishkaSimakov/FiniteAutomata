@@ -8,7 +8,7 @@ add_library(FiniteAutomata
         regex/RegexPrinter.h
         weaponry/FiniteAutomata.h
         regex/CustomRegex.h
-        weaponry/CharsetInfo.h
+        CharsetInfo.h
         weaponry/parts/NonDeterministicToDeterministic.cpp
         weaponry/FiniteAutomataPrinter.h
         weaponry/parts/DeterministicToRegex.cpp

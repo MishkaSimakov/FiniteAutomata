@@ -3,9 +3,7 @@
 #include <locale>
 #include <vector>
 
-struct ParseError final : std::runtime_error {
-  ParseError() : runtime_error("Error occured while parsing regex") {}
-};
+#include "CharsetInfo.h"
 
 std::string_view::iterator RegexParser::get_matching_paren(
     std::string_view regex) {
@@ -64,7 +62,7 @@ std::unique_ptr<RegexNode> RegexParser::parse_recursively(
   regex = trim(regex);
 
   if (regex.empty()) {
-    return nullptr;
+    throw ParseError();
   }
 
   // we split regex into two parts: left + right and parse them recursively
@@ -94,6 +92,11 @@ std::unique_ptr<RegexNode> RegexParser::parse_recursively(
     left = std::make_unique<ZeroNode>();
     regex.remove_prefix(1);
   } else {
+    // symbol should be in range of our charset
+    if (!Charset::contains(regex.front())) {
+      throw ParseError();
+    }
+
     left = std::make_unique<SymbolNode>(regex.front());
     regex.remove_prefix(1);
   }

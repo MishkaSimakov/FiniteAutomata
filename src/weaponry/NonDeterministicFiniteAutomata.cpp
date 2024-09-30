@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <queue>
 
-#include "CharsetInfo.h"
+#include "../CharsetInfo.h"
 
 struct NonDeterministicFiniteAutomata::FiniteAutomataBuilderVisitor final
     : RegexConstNodeVisitor {

@@ -4,6 +4,10 @@
 
 #include "RegexNodes.h"
 
+struct ParseError final : std::runtime_error {
+  ParseError() : runtime_error("Error occured while parsing regex") {}
+};
+
 class RegexParser {
   static std::string_view::iterator get_matching_paren(std::string_view regex);
 
