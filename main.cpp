@@ -1,24 +1,19 @@
 #include <fstream>
 
-#include "DeterministicFiniteAutomata.h"
+#include "FiniteAutomata.h"
 #include "FiniteAutomataPrinter.h"
 #include "RegexPrinter.h"
 
 int main() {
-  auto automata = DeterministicFiniteAutomata(Regex("(1 + (b + a(a + b))((a + b))*)"));
+  auto first = FiniteAutomata(Regex("b + (1 + a + (a)*)(1 + 1)"));
+  auto second = FiniteAutomata(Regex("(a)* + b"));
 
-  std::ofstream os(
-        "/Users/mihailsimakov/Documents/Programs/CLionProjects/FiniteAutomata/"
-        "files/drawing.dot");
-  os << FiniteAutomataPrinter(automata);
-  os.close();
+  std::cout << first.is_language_equal(second) << std::endl;
 
-  automata.complement();
-
-  auto regex = automata.get_regex();
-
-  std::cout << RegexPrinter(regex) << std::endl;
-  std::cout << RegexPrinter(regex.optimize()) << std::endl;
+  // auto regex = automata.get_regex();
+  //
+  // std::cout << RegexPrinter(regex) << std::endl;
+  // std::cout << RegexPrinter(regex.optimize()) << std::endl;
 
   return 0;
 }

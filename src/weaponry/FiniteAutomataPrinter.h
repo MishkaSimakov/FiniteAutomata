@@ -3,13 +3,13 @@
 
 #include <iostream>
 
-#include "DeterministicFiniteAutomata.h"
+#include "FiniteAutomata.h"
 
 class FiniteAutomataPrinter {
-  const DeterministicFiniteAutomata& automata_;
+  const FiniteAutomata& automata_;
 
  public:
-  explicit FiniteAutomataPrinter(const DeterministicFiniteAutomata& automata)
+  explicit FiniteAutomataPrinter(const FiniteAutomata& automata)
       : automata_(automata) {}
 
   void print(std::ostream& os) const {

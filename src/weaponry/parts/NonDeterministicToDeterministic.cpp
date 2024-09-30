@@ -1,10 +1,12 @@
-#include "DeterministicFiniteAutomata.h"
+#include "FiniteAutomata.h"
 
-DeterministicFiniteAutomata::DeterministicFiniteAutomata(
-    const FiniteAutomata& automata) {
-  using NDNode = typename FiniteAutomata::Node;
+#include <queue>
+
+FiniteAutomata::FiniteAutomata(
+    const NonDeterministicFiniteAutomata& automata) {
+  using NDNode = typename NonDeterministicFiniteAutomata::Node;
   using NDNodeCref = std::reference_wrapper<const NDNode>;
-  using DNode = DeterministicFiniteAutomata::Node;
+  using DNode = FiniteAutomata::Node;
 
   const auto& old_nodes_list = automata.get_nodes();
   std::vector<NDNodeCref> old_nodes(old_nodes_list.begin(),
@@ -12,7 +14,7 @@ DeterministicFiniteAutomata::DeterministicFiniteAutomata(
 
   std::unordered_set<const NDNode*> start_nodes;
   start_nodes.insert(&automata.get_nodes().front());
-  FiniteAutomata::do_empty_jumps(start_nodes);
+  NonDeterministicFiniteAutomata::do_empty_jumps(start_nodes);
 
   // add new start node
   DNode& start = nodes.emplace_back();
@@ -51,7 +53,7 @@ DeterministicFiniteAutomata::DeterministicFiniteAutomata(
 
     for (auto symbol : Charset::get_symbols()) {
       auto copy = current_nodes_pointers;
-      FiniteAutomata::do_jumps(copy, symbol);
+      NonDeterministicFiniteAutomata::do_jumps(copy, symbol);
 
       bool is_final = false;
       std::vector mask_after_jumps(automata.size(), false);

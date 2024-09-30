@@ -1,12 +1,11 @@
 #include <gtest/gtest.h>
 
-#include "DeterministicFiniteAutomata.h"
 #include "FiniteAutomata.h"
 #include "RegexStrings.h"
 
 TEST(NonDeterministicToDeterministicTests, test_it_accepts_same_words) {
   for (const auto& [regex, correct, incorrect] : regex_strings) {
-    auto automata = DeterministicFiniteAutomata(regex);
+    auto automata = FiniteAutomata(regex);
 
     for (const auto& string : correct) {
       ASSERT_TRUE(automata.contains(string))

@@ -1,4 +1,6 @@
-#include "DeterministicFiniteAutomata.h"
+#include "FiniteAutomata.h"
+
+#include <queue>
 
 struct RegexAutomata {
   struct RegexAutomataNode {
@@ -73,7 +75,7 @@ struct RegexAutomata {
         nodes, [](const RegexAutomataNode& node) { return !node.reachable; });
   }
 
-  explicit RegexAutomata(const DeterministicFiniteAutomata& automata) {
+  explicit RegexAutomata(const FiniteAutomata& automata) {
     const auto& other_nodes = automata.nodes;
 
     std::vector<RegexAutomataNode*> nodes_mapping(automata.nodes.size());
@@ -164,15 +166,15 @@ struct RegexAutomata {
   }
 };
 
-DeterministicFiniteAutomata& DeterministicFiniteAutomata::complement() {
-  for (auto& node: nodes) {
+FiniteAutomata& FiniteAutomata::complement() {
+  for (auto& node : nodes) {
     node.is_final = !node.is_final;
   }
 
   return *this;
 }
 
-Regex DeterministicFiniteAutomata::get_regex() const {
+Regex FiniteAutomata::get_regex() const {
   auto automata = RegexAutomata(*this);
   automata.erase_paths();
 
@@ -203,4 +205,34 @@ Regex DeterministicFiniteAutomata::get_regex() const {
   inner_cycle.iterate();
 
   return front_cycle * front_to_final * inner_cycle;
+}
+
+FiniteAutomata operator&(const FiniteAutomata& left,
+                         const FiniteAutomata& right) {
+  FiniteAutomata result;
+
+  size_t left_size = left.nodes.size();
+  size_t right_size = right.nodes.size();
+
+  result.nodes.resize(left_size * right_size);
+
+  for (size_t i = 0; i < left_size; ++i) {
+    for (size_t j = 0; j < right_size; ++j) {
+      size_t index = i * right_size + j;
+
+      const auto& left_node = left.nodes[i];
+      const auto& right_node = right.nodes[j];
+
+      result.nodes[index].is_final = left_node.is_final && right_node.is_final;
+
+      for (size_t k = 0; k < Charset::symbols_count; ++k) {
+        result.nodes[index].jumps[k] =
+            left_node.jumps[k] * right_size + right_node.jumps[k];
+      }
+    }
+  }
+
+  result.optimize();
+
+  return result;
 }

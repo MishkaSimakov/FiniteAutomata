@@ -6,6 +6,8 @@ add_executable(
         unit/finite_automata/NonDeterministicToDeterministicTests.cpp
         unit/finite_automata/RegexStrings.h
         unit/finite_automata/RegexStrings.cpp
+        unit/finite_automata/LanguagesEqualityTests.cpp
+        unit/finite_automata/MinimalAutomataTests.cpp
 )
 
 target_link_libraries(Tests GTest::gtest_main FiniteAutomata)

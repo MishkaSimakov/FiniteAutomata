@@ -1,21 +1,22 @@
 add_library(FiniteAutomata
-        weaponry/FiniteAutomata.h
-        weaponry/FiniteAutomata.cpp
+        weaponry/NonDeterministicFiniteAutomata.h
+        weaponry/NonDeterministicFiniteAutomata.cpp
         regex/RegexParser.cpp
         regex/RegexParser.h
         regex/RegexNodes.h
         regex/RegexPrinter.cpp
         regex/RegexPrinter.h
-        weaponry/DeterministicFiniteAutomata.h
+        weaponry/FiniteAutomata.h
         regex/CustomRegex.h
         weaponry/CharsetInfo.h
-        weaponry/converters/NonDeterministicToDeterministic.cpp
+        weaponry/parts/NonDeterministicToDeterministic.cpp
         weaponry/FiniteAutomataPrinter.h
-        weaponry/converters/DeterministicToRegex.cpp
-        weaponry/DeterministicFiniteAutomata.cpp
+        weaponry/parts/DeterministicToRegex.cpp
+        weaponry/FiniteAutomata.cpp
         regex/CustomRegex.cpp
         regex/CustomRegex.cpp
-        weaponry/converters/DeterministicToMinimal.cpp
+        weaponry/parts/DeterministicToMinimal.cpp
+        weaponry/parts/AutomataEquivalenceCheck.cpp
 )
 
 target_link_libraries(FiniteAutomata fmt::fmt)
