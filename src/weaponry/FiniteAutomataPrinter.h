@@ -5,13 +5,11 @@
 
 #include "DeterministicFiniteAutomata.h"
 
-template <typename Charset>
 class FiniteAutomataPrinter {
-  const DeterministicFiniteAutomata<Charset>& automata_;
+  const DeterministicFiniteAutomata& automata_;
 
  public:
-  explicit FiniteAutomataPrinter(
-      const DeterministicFiniteAutomata<Charset>& automata)
+  explicit FiniteAutomataPrinter(const DeterministicFiniteAutomata& automata)
       : automata_(automata) {}
 
   void print(std::ostream& os) const {
@@ -50,9 +48,8 @@ class FiniteAutomataPrinter {
   }
 };
 
-template <typename Charset>
 std::ostream& operator<<(std::ostream& os,
-                         const FiniteAutomataPrinter<Charset>& printer) {
+                         const FiniteAutomataPrinter& printer) {
   printer.print(os);
   return os;
 }

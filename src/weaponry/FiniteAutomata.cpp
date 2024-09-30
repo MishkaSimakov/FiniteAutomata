@@ -5,11 +5,80 @@
 
 #include "CharsetInfo.h"
 
-template class FiniteAutomata<CharsetInfo>;
-template class FiniteAutomata<BinaryCharsetInfo>;
+struct FiniteAutomata::FiniteAutomataBuilderVisitor final : RegexConstNodeVisitor {
+  FiniteAutomata result;
 
-template<typename Charset>
-void FiniteAutomata<Charset>::remove_unreachable_nodes() {
+  void visit(const SymbolNode& node) override {
+    auto& start_node = result.get_start_node();
+    auto& end_node = result.add_node();
+
+    start_node.jumps.emplace(node.symbol, &end_node);
+    end_node.is_final = true;
+  }
+
+  void visit(const ZeroNode& node) override {}
+  void visit(const OneNode& node) override {
+    auto& start_node = result.get_start_node();
+    auto& end_node = result.add_node();
+
+    start_node.jumps.emplace(cEmptyChar, &end_node);
+    end_node.is_final = true;
+  }
+
+  void visit(const ConcatenationNode& node) override {
+    FiniteAutomata concatenated;
+
+    node.left->accept(*this);
+
+    std::swap(concatenated, result);
+
+    node.right->accept(*this);
+
+    for (Node& final_node : concatenated.get_final_nodes()) {
+      final_node.is_final = false;
+      final_node.jumps.emplace(cEmptyChar, &result.get_start_node());
+    }
+
+    result.nodes_.splice(result.nodes_.begin(), concatenated.nodes_);
+  }
+
+  void visit(const OrNode& node) override {
+    FiniteAutomata concatenated;
+
+    node.left->accept(*this);
+
+    std::swap(concatenated, result);
+
+    node.right->accept(*this);
+
+    Node& left_front = concatenated.get_start_node();
+    Node& right_front = result.get_start_node();
+
+    Node& front = result.nodes_.emplace_front();
+    front.jumps.emplace(cEmptyChar, &left_front);
+    front.jumps.emplace(cEmptyChar, &right_front);
+
+    result.nodes_.splice(result.nodes_.end(), concatenated.nodes_);
+  }
+
+  void visit(const StarNode& node) override {
+    node.child->accept(*this);
+
+    auto& old_front = result.get_start_node();
+    auto& front = result.nodes_.emplace_front();
+
+    front.jumps.emplace(cEmptyChar, &old_front);
+
+    for (auto& final_node : result.get_final_nodes()) {
+      final_node.is_final = false;
+      final_node.jumps.emplace(cEmptyChar, &front);
+    }
+
+    front.is_final = true;
+  }
+};
+
+void FiniteAutomata::remove_unreachable_nodes() {
   std::unordered_set<const Node*> visited;
   std::queue<const Node*> queue;
 
@@ -38,8 +107,44 @@ void FiniteAutomata<Charset>::remove_unreachable_nodes() {
   }
 }
 
-template<typename Charset>
-void FiniteAutomata<Charset>::remove_empty_jumps() {
+FiniteAutomata::FiniteAutomata(const Regex& regex) {
+  FiniteAutomataBuilderVisitor visitor;
+  regex.get_root().accept(visitor);
+
+  *this = std::move(visitor.result);
+}
+
+bool FiniteAutomata::containts_word(std::string_view word) const {
+  std::unordered_set<const Node*> current;
+  current.insert(&nodes_.front());
+
+  while (!word.empty()) {
+    char current_letter = word.front();
+
+    // jump by edges with empty letter
+    do_empty_jumps(current);
+
+    // do non-empty jumps
+    std::unordered_set<const Node*> new_current;
+    for (const Node* node : current) {
+      auto [begin, end] = node->jumps.equal_range(current_letter);
+
+      for (; begin != end; ++begin) {
+        new_current.insert(begin->second);
+      }
+    }
+
+    current = std::move(new_current);
+    word.remove_prefix(1);
+  }
+
+  do_empty_jumps(current);
+
+  return std::ranges::any_of(current,
+                             [](const Node* node) { return node->is_final; });
+}
+
+void FiniteAutomata::remove_empty_jumps() {
   for (auto& node : nodes_) {
     std::unordered_set<Node*> nodes;
     nodes.insert(&node);

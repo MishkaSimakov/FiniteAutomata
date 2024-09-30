@@ -1,11 +1,8 @@
-#pragma once
+#include "DeterministicFiniteAutomata.h"
 
-// Achtung! Internal header, do not use outside
-
-template <typename Charset>
-DeterministicFiniteAutomata<Charset>::DeterministicFiniteAutomata(
-    const FiniteAutomata<Charset>& automata) {
-  using NDNode = typename FiniteAutomata<Charset>::Node;
+DeterministicFiniteAutomata::DeterministicFiniteAutomata(
+    const FiniteAutomata& automata) {
+  using NDNode = typename FiniteAutomata::Node;
   using NDNodeCref = std::reference_wrapper<const NDNode>;
   using DNode = DeterministicFiniteAutomata::Node;
 
@@ -15,7 +12,7 @@ DeterministicFiniteAutomata<Charset>::DeterministicFiniteAutomata(
 
   std::unordered_set<const NDNode*> start_nodes;
   start_nodes.insert(&automata.get_nodes().front());
-  FiniteAutomata<Charset>::do_empty_jumps(start_nodes);
+  FiniteAutomata::do_empty_jumps(start_nodes);
 
   // add new start node
   DNode& start = nodes.emplace_back();
@@ -54,7 +51,7 @@ DeterministicFiniteAutomata<Charset>::DeterministicFiniteAutomata(
 
     for (auto symbol : Charset::get_symbols()) {
       auto copy = current_nodes_pointers;
-      FiniteAutomata<Charset>::do_jumps(copy, symbol);
+      FiniteAutomata::do_jumps(copy, symbol);
 
       bool is_final = false;
       std::vector mask_after_jumps(automata.size(), false);

@@ -8,11 +8,14 @@ add_library(FiniteAutomata
         regex/RegexPrinter.h
         weaponry/DeterministicFiniteAutomata.h
         regex/CustomRegex.h
-        regex/CustomRegex.h
         weaponry/CharsetInfo.h
-        weaponry/CharsetInfo.h
-        weaponry/converters/NonDeterministicToDeterministic.h
+        weaponry/converters/NonDeterministicToDeterministic.cpp
         weaponry/FiniteAutomataPrinter.h
+        weaponry/converters/DeterministicToRegex.cpp
+        weaponry/DeterministicFiniteAutomata.cpp
+        regex/CustomRegex.cpp
+        regex/CustomRegex.cpp
+        weaponry/converters/DeterministicToMinimal.cpp
 )
 
 target_link_libraries(FiniteAutomata fmt::fmt)

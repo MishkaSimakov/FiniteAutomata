@@ -2,10 +2,9 @@
 #include <array>
 #include <queue>
 
-#include "FiniteAutomata.h"
 #include "CustomRegex.h"
+#include "FiniteAutomata.h"
 
-template <typename Charset = CharsetInfo>
 class DeterministicFiniteAutomata {
  public:
   struct Node {
@@ -16,57 +15,15 @@ class DeterministicFiniteAutomata {
 
   std::deque<Node> nodes;
 
-  DeterministicFiniteAutomata() {
-    nodes.emplace_back();
-
-    for (size_t& jump : nodes.front().jumps) {
-      jump = 0;
-    }
-  }
+  DeterministicFiniteAutomata();
 
   explicit DeterministicFiniteAutomata(const Regex& regex)
-      : DeterministicFiniteAutomata(FiniteAutomata<Charset>(regex)) {}
-  explicit DeterministicFiniteAutomata(
-      const FiniteAutomata<Charset>& finite_automata);
+      : DeterministicFiniteAutomata(FiniteAutomata(regex)) {}
+  explicit DeterministicFiniteAutomata(const FiniteAutomata& finite_automata);
 
-  void optimize() {
-    // find and remove unreachable nodes
-    std::vector<bool> visited(nodes.size(), false);
-    visited[0] = true;
+  void optimize();
 
-    std::queue<size_t> queue;
-    queue.push(0);
-
-    while (!queue.empty()) {
-      size_t current = queue.front();
-      queue.pop();
-
-      for (size_t next : nodes[current].jumps) {
-        if (!visited[next]) {
-          visited[next] = true;
-          queue.push(next);
-        }
-      }
-    }
-
-    std::vector<size_t> new_indices(nodes.size());
-    size_t index = 0;
-    for (size_t i = 0; i < nodes.size(); ++i) {
-      if (visited[i]) {
-        new_indices[i] = index;
-        nodes[index] = std::move(nodes[i]);
-        ++index;
-      }
-    }
-
-    nodes.resize(index);
-
-    for (Node& node : nodes) {
-      for (size_t& jump : node.jumps) {
-        jump = new_indices[jump];
-      }
-    }
-  }
+  DeterministicFiniteAutomata get_minimal() const;
 
   bool contains(std::string_view word) {
     size_t state = 0;
@@ -76,12 +33,15 @@ class DeterministicFiniteAutomata {
 
     return nodes[state].is_final;
   }
+
+  DeterministicFiniteAutomata& complement();
+
+  Regex get_regex() const;
 };
 
-template <typename Charset>
-auto operator&(const DeterministicFiniteAutomata<Charset>& left,
-               const DeterministicFiniteAutomata<Charset>& right) {
-  DeterministicFiniteAutomata<Charset> result;
+inline auto operator&(const DeterministicFiniteAutomata& left,
+                      const DeterministicFiniteAutomata& right) {
+  DeterministicFiniteAutomata result;
 
   size_t left_size = left.nodes.size();
   size_t right_size = right.nodes.size();
@@ -108,5 +68,3 @@ auto operator&(const DeterministicFiniteAutomata<Charset>& left,
 
   return result;
 }
-
-#include "converters/NonDeterministicToDeterministic.h"

@@ -21,3 +21,5 @@ struct BinaryCharsetInfo {
 
   static size_t get_index(char symbol) { return symbol - 'a'; }
 };
+
+using Charset = BinaryCharsetInfo;

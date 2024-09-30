@@ -3,7 +3,7 @@
 #include "RegexNodes.h"
 
 namespace {
-struct RegexPrinterVisitor : RegexNodeVisitor {
+struct RegexPrinterVisitor : RegexConstNodeVisitor {
   std::ostream& os;
 
   explicit RegexPrinterVisitor(std::ostream& os) : os(os) {}
@@ -18,7 +18,7 @@ struct RegexPrinterVisitor : RegexNodeVisitor {
   void visit(const OrNode& node) override {
     os << "(";
     node.left->accept(*this);
-    os << " | ";
+    os << " + ";
     node.right->accept(*this);
     os << ")";
   }

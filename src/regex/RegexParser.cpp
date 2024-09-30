@@ -45,14 +45,14 @@ std::string_view RegexParser::trim(std::string_view string) {
 
 std::unique_ptr<RegexNode> RegexParser::parse_recursively(
     std::string_view regex) {
-  // search for top-level |
+  // search for top-level +
   int balance = 0;
   for (auto itr = regex.begin(); itr != regex.end(); ++itr) {
     if (*itr == '(') {
       ++balance;
     } else if (*itr == ')') {
       --balance;
-    } else if (*itr == '|' && balance == 0) {
+    } else if (*itr == '+' && balance == 0) {
       auto right = parse_recursively({std::next(itr), regex.end()});
       auto left = parse_recursively({regex.begin(), itr});
 
@@ -60,7 +60,7 @@ std::unique_ptr<RegexNode> RegexParser::parse_recursively(
     }
   }
 
-  // if there isn't any "|" inside we should just concatenate each part
+  // if there isn't any "+" inside we should just concatenate each part
   regex = trim(regex);
 
   if (regex.empty()) {
@@ -74,7 +74,7 @@ std::unique_ptr<RegexNode> RegexParser::parse_recursively(
     auto end_itr = get_matching_paren(regex);
 
     if (end_itr == std::next(regex.begin())) {
-      // we dont allow empty parens, e.g "() | a"
+      // we dont allow empty parens, e.g "() + a"
       throw ParseError();
     }
 
