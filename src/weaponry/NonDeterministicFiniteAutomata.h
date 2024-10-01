@@ -55,11 +55,10 @@ class NonDeterministicFiniteAutomata {
   const std::list<Node>& get_nodes() const { return nodes_; }
 
   template <typename T>
-    requires(std::same_as<T, const Node*> || std::same_as<T, Node*>)
-  static void do_jumps(std::unordered_set<T>& nodes, char letter) {
+  static void do_jumps(T& nodes, char letter) {
     do_empty_jumps(nodes);
 
-    std::unordered_set<T> next_nodes;
+    T next_nodes;
     for (const Node* node : nodes) {
       auto [beg, end] = node->jumps.equal_range(letter);
 
@@ -72,21 +71,39 @@ class NonDeterministicFiniteAutomata {
     nodes = std::move(next_nodes);
   }
 
+  // return true if one of resulting nodes is final
   template <typename T>
-    requires(std::same_as<T, const Node*> || std::same_as<T, Node*>)
-  static void do_empty_jumps(std::unordered_set<T>& nodes) {
+  static bool do_empty_jumps(T& nodes) {
     std::list<const Node*> unprocessed;
-    std::copy(nodes.begin(), nodes.end(), std::back_inserter(unprocessed));
-    while (!unprocessed.empty()) {
-      const Node* current = unprocessed.front();
-      unprocessed.pop_front();
+    bool is_final = false;
 
-      for (const auto& [symbol, next] : current->jumps) {
-        if (symbol == cEmptyChar && !nodes.contains(next)) {
+    auto process_node = [&is_final, &unprocessed, &nodes](const Node* node) {
+      if (node->is_final) {
+        is_final = true;
+      }
+
+      auto [beg, end] = node->jumps.equal_range(cEmptyChar);
+      for (auto* next : std::ranges::subrange{beg, end} | std::views::values) {
+        if (!nodes.contains(next)) {
           nodes.insert(next);
           unprocessed.push_back(next);
         }
       }
+    };
+
+    // first we process already existing nodes
+    for (const Node* node : nodes) {
+      process_node(node);
     }
+
+    // then we process all that stuff that added
+    while (!unprocessed.empty()) {
+      const Node* current = unprocessed.front();
+      unprocessed.pop_front();
+
+      process_node(current);
+    }
+
+    return is_final;
   }
 };

@@ -8,7 +8,6 @@
 class FiniteAutomata {
  public:
   struct Node {
-    std::unordered_set<size_t> old_indices;
     bool is_final{false};
     std::array<size_t, Charset::symbols_count> jumps{};
   };

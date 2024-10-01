@@ -3,7 +3,7 @@ project(FiniteAutomata)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-fsanitize=address")
+set(CMAKE_CXX_FLAGS "-fsanitize=address -O3")
 
 include(FetchContent)
 
@@ -29,8 +29,14 @@ enable_testing()
 
 add_subdirectory(src)
 
+# install Google Benchmark
+find_package(benchmark REQUIRED)
+
 # testing target
 add_subdirectory(tests)
+
+# benchmark target
+add_subdirectory(benchmarks)
 
 # just example target
 add_executable(Example main.cpp)
