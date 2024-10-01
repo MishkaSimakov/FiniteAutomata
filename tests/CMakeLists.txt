@@ -12,6 +12,8 @@ add_executable(
         finite_automata/AutomataToRegexTests.cpp
 )
 
+set_target_properties(Tests PROPERTIES CMAKE_CXX_FLAGS "-fsanitize=address")
+
 target_link_libraries(Tests GTest::gtest_main FiniteAutomata)
 include(GoogleTest)
 gtest_discover_tests(Tests)

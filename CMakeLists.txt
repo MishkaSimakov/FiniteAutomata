@@ -3,7 +3,6 @@ project(FiniteAutomata)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-fsanitize=address -O3")
 
 include(FetchContent)
 
@@ -41,3 +40,4 @@ add_subdirectory(benchmarks)
 # just example target
 add_executable(Example main.cpp)
 target_link_libraries(Example FiniteAutomata)
+set_target_properties(Example PROPERTIES CMAKE_CXX_FLAGS "-fsanitize=address")

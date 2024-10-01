@@ -26,4 +26,15 @@ TEST(ComplementTests, test_complement_language_equality) {
 
     ASSERT_TRUE(even_a.is_language_equal(odd_a));
   }
+
+  {
+    auto ab_equal_ba =
+        FiniteAutomata(Regex("(a(a)*b(b)*)*a(a)* + (b(b)*a(a)*)*b(b)* + 1"));
+    ab_equal_ba.complement();
+
+    auto ab_not_equal_ba = FiniteAutomata(
+        Regex("(a(a)*b(b)*)(a(a)*b(b)*)* + (b(b)*a(a)*)(b(b)*a(a)*)*"));
+
+    ASSERT_TRUE(ab_equal_ba.is_language_equal(ab_not_equal_ba));
+  }
 }

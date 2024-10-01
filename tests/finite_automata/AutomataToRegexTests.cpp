@@ -20,3 +20,21 @@ TEST(ComplementTests, test_generated_regex_accepts_same_strings) {
     }
   }
 }
+
+TEST(ComplementTests, test_generated_complement_regex_accepts_correct_strings) {
+  for (const auto& [regex, correct, incorrect] : regex_strings) {
+    auto automata = FiniteAutomata(regex);
+    automata.complement();
+
+    auto generated_regex = automata.get_regex();
+    automata = FiniteAutomata(generated_regex);
+
+    for (const auto& string : correct) {
+      ASSERT_FALSE(automata.contains(string));
+    }
+
+    for (const auto& string : incorrect) {
+      ASSERT_TRUE(automata.contains(string));
+    }
+  }
+}

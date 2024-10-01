@@ -46,6 +46,12 @@ const auto regex_strings = [] {
           std::vector<const char*>{},
           std::vector{"", "a", "b", "aa", "ab", "ba", "bb", "abababababbab"});
 
+  result.emplace_back(
+          Regex("(a(a)*b(b)*)*a(a)* + (b(b)*a(a)*)*b(b)* + 1"),
+          std::vector{"", "ababa", "aaaaaba", "abba", "baab", "bbbbaaabbbb", "babab", "a", "b", "aaaaaa", "bbbbbbb", "aa", "bb"},
+          std::vector{"ba", "ab", "abab", "baba", "baaaaababbbba", "abbbbab"});
+
+
   // clang-format on
 
   return result;

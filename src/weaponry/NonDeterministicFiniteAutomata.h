@@ -54,23 +54,6 @@ class NonDeterministicFiniteAutomata {
 
   const std::list<Node>& get_nodes() const { return nodes_; }
 
-  template <typename T>
-  static void do_jumps(T& nodes, char letter) {
-    do_empty_jumps(nodes);
-
-    T next_nodes;
-    for (const Node* node : nodes) {
-      auto [beg, end] = node->jumps.equal_range(letter);
-
-      for (; beg != end; ++beg) {
-        next_nodes.insert(beg->second);
-      }
-    }
-
-    do_empty_jumps(next_nodes);
-    nodes = std::move(next_nodes);
-  }
-
   // return true if one of resulting nodes is final
   template <typename T>
   static bool do_empty_jumps(T& nodes) {
