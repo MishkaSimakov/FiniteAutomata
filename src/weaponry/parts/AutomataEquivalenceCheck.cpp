@@ -42,15 +42,19 @@ struct IsomorphismChecker {
 };
 }  // namespace
 
+bool FiniteAutomata::is_isomorphic_to(const FiniteAutomata& other) const {
+  // compare if automatas are isomorphic
+  if (nodes.size() != other.nodes.size()) {
+    return false;
+  }
+
+  IsomorphismChecker checker(nodes, other.nodes);
+  return checker.is_isomorphic_recursive(0, 0);
+}
+
 bool FiniteAutomata::is_language_equal(const FiniteAutomata& other) const {
   auto left_minimal = get_minimal();
   auto right_minimal = other.get_minimal();
 
-  // compare if automatas are isomorphic
-  if (left_minimal.nodes.size() != right_minimal.nodes.size()) {
-    return false;
-  }
-
-  IsomorphismChecker checker(left_minimal.nodes, right_minimal.nodes);
-  return checker.is_isomorphic_recursive(0, 0);
+  return left_minimal.is_isomorphic_to(right_minimal);
 }

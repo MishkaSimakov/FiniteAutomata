@@ -7,6 +7,8 @@ inline std::vector equivalent_regexes = {
     std::pair{"1 + a + aa + aaa + aaaa(a)*", "(a)*"},
     std::pair{"aba + baa", "(ab + ba)a"},
     std::pair{"(a + 1)*", "(a)*"},
+    std::pair{"(0)*", "1"},
+    std::pair{"(1)*", "1"},
     std::pair{"(0 + ((0 + 0(0 + 0)0) + 0))0(0 + 0)", "0"},
     std::pair{"1(1 + 1 + 1)(1 + 0)", "1"},
     std::pair{"(a + b)(a + b)", "aa + ab + ba + bb"},

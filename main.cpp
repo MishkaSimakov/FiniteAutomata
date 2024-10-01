@@ -5,7 +5,5 @@
 #include "RegexPrinter.h"
 
 int main() {
-  auto regex = Regex("(a + )");
-
   return 0;
 }

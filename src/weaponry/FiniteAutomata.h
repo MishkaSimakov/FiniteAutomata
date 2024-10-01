@@ -23,6 +23,7 @@ class FiniteAutomata {
 
   void optimize();
 
+  bool is_isomorphic_to(const FiniteAutomata& other) const;
   bool is_language_equal(const FiniteAutomata& other) const;
 
   FiniteAutomata get_minimal() const;

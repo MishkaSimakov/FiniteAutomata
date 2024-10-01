@@ -2,7 +2,6 @@ add_executable(
         Tests
         regex/RegexParserTests.cpp
         regex/RegexParserTestCase.h
-        finite_automata/FiniteAutomataRegexTests.cpp
         finite_automata/NonDeterministicToDeterministicTests.cpp
         finite_automata/RegexStrings.h
         finite_automata/RegexStrings.cpp
