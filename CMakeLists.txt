@@ -30,6 +30,14 @@ add_subdirectory(src)
 
 # install Google Benchmark
 find_package(benchmark REQUIRED)
+IF (NOT benchmark_FOUND)
+    message("Google Benchmark not found locally, installing from github...")
+
+    FetchContent_Declare(benchmark
+            GIT_REPOSITORY https://github.com/google/benchmark.git
+            GIT_TAG main)
+    FetchContent_MakeAvailable(benchmark)
+ENDIF ()
 
 # testing target
 add_subdirectory(tests)

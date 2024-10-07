@@ -5,12 +5,81 @@
 
 #include "FiniteAutomata.h"
 
+template <typename T>
+  requires std::same_as<T, FiniteAutomata> ||
+           std::same_as<T, NonDeterministicFiniteAutomata>
 class FiniteAutomataPrinter {
-  const FiniteAutomata& automata_;
+  const T& automata_;
+
+  // for deterministic
+  static void print_automata_edges(const FiniteAutomata& automata,
+                                   std::ostream& os) {
+    for (size_t i = 0; i < automata.nodes.size(); ++i) {
+      const auto& node = automata.nodes[i];
+
+      for (size_t j = 0; j < node.jumps.size(); ++j) {
+        os << fmt::format("{} -> {} [label = \"{}\"];", i, node.jumps[j],
+                          Charset::get_symbols()[j])
+           << std::endl;
+      }
+    }
+  }
+
+  static std::vector<size_t> get_automata_final_nodes(
+      const FiniteAutomata& automata) {
+    std::vector<size_t> final_nodes_indices;
+    for (size_t i = 0; i < automata.nodes.size(); ++i) {
+      if (automata.nodes[i].is_final) {
+        final_nodes_indices.push_back(i);
+      }
+    }
+
+    return final_nodes_indices;
+  }
+
+  // for non-deterministic
+  static void print_automata_edges(
+      const NonDeterministicFiniteAutomata& automata, std::ostream& os) {
+    std::unordered_map<const NonDeterministicFiniteAutomata::Node*, size_t>
+        indices;
+    size_t current_index = 0;
+    for (const auto& node : automata.get_nodes()) {
+      indices.emplace(&node, current_index);
+      ++current_index;
+    }
+
+    for (const auto& node : automata.get_nodes()) {
+      size_t index = indices[&node];
+
+      for (auto [letter, next] : node.jumps) {
+        size_t next_index = indices[next];
+
+        os << fmt::format("{} -> {} [label = \"{}\"];", index, next_index,
+                          letter == NonDeterministicFiniteAutomata::cEmptyChar
+                              ? "ε"
+                              : std::string(1, letter))
+           << std::endl;
+      }
+    }
+  }
+
+  static std::vector<size_t> get_automata_final_nodes(
+      const NonDeterministicFiniteAutomata& automata) {
+    std::vector<size_t> final_nodes_indices;
+    size_t current_index = 0;
+    for (const auto& node : automata.get_nodes()) {
+      if (node.is_final) {
+        final_nodes_indices.push_back(current_index);
+      }
+
+      ++current_index;
+    }
+
+    return final_nodes_indices;
+  }
 
  public:
-  explicit FiniteAutomataPrinter(const FiniteAutomata& automata)
-      : automata_(automata) {}
+  explicit FiniteAutomataPrinter(const T& automata) : automata_(automata) {}
 
   void print(std::ostream& os) const {
     auto println = [&os](std::string_view string) { os << string << "\n"; };
@@ -21,35 +90,24 @@ class FiniteAutomataPrinter {
     println("edge [fontname=\"Helvetica,Arial,sans-serif\"]");
     println("rankdir=LR;");
 
-    std::vector<size_t> final_nodes_indices;
-    for (size_t i = 0; i < automata_.nodes.size(); ++i) {
-      if (automata_.nodes[i].is_final) {
-        final_nodes_indices.push_back(i);
-      }
-    }
-
-    if (!final_nodes_indices.empty()) {
-      println(fmt::format("node [shape = doublecircle]; {};",
-                          fmt::join(final_nodes_indices, ", ")));
+    auto final_indices = get_automata_final_nodes(automata_);
+    if (!final_indices.empty()) {
+      os << fmt::format("node [shape = doublecircle]; {};",
+                        fmt::join(final_indices, ", "))
+         << std::endl;
     }
 
     println("node [shape = circle];");
 
-    for (size_t i = 0; i < automata_.nodes.size(); ++i) {
-      const auto& node = automata_.nodes[i];
-
-      for (size_t j = 0; j < node.jumps.size(); ++j) {
-        println(fmt::format("{} -> {} [label = \"{}\"];", i, node.jumps[j],
-                            Charset::get_symbols()[j]));
-      }
-    }
+    print_automata_edges(automata_, os);
 
     println("}");
   }
 };
 
+template <typename T>
 std::ostream& operator<<(std::ostream& os,
-                         const FiniteAutomataPrinter& printer) {
+                         const FiniteAutomataPrinter<T>& printer) {
   printer.print(os);
   return os;
 }

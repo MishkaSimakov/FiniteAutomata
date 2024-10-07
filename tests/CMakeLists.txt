@@ -11,6 +11,7 @@ add_executable(
         weaponry/AutomataToRegexTests.cpp
         weaponry/NonDeterministicTests.cpp
         regex/RegexOptimizationTests.cpp
+        weaponry/AutomataPrinterTests.cpp
 )
 target_include_directories(Tests PRIVATE .)
 

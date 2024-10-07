@@ -43,8 +43,6 @@ TEST(MinimalAutomataTests, test_it_calculate_correct_automata_for_regex) {
   ASSERT_TRUE(actual.is_isomorphic_to(predicted));
 }
 
-#include <fstream>
-
 TEST(MinimalAutomataTests, test_it_calculate_correct_automata_for_dfa) {
   auto automata = FiniteAutomata();
   automata.nodes.resize(5);
