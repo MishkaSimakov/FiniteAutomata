@@ -14,7 +14,7 @@ extern const std::vector<
 enum RegexStringType { CORRECT, INCORRECT };
 
 inline std::string error_message(const Regex& regex, std::string_view string,
-                          RegexStringType string_type) {
+                                 RegexStringType string_type) {
   if (string_type == CORRECT) {
     return fmt::format(
         "Non-deterministic finite automata for regex {} should accept string "

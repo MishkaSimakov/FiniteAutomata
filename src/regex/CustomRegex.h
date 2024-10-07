@@ -60,6 +60,8 @@ class Regex {
 
     return *this;
   }
+
+  std::string to_string() const;
 };
 
 inline Regex operator+(const Regex& left, const Regex& right) {

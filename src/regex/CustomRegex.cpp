@@ -43,9 +43,6 @@ struct RegexOptimizeVisitor : RegexNodeVisitor {
 
     if (result != nullptr) {
       node = std::move(result);
-
-      std::cout << RegexPrinter(Regex(std::move(clone))) << " -> "
-                << RegexPrinter(Regex(node->clone())) << std::endl;
     }
   }
 
@@ -169,4 +166,11 @@ Regex& Regex::optimize() {
   visitor.optimize(root_);
 
   return *this;
+}
+
+std::string Regex::to_string() const {
+  std::stringstream result;
+  result << RegexPrinter(*this);
+
+  return result.str();
 }

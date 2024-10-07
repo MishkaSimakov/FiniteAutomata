@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "FiniteAutomata.h"
 #include "RegexStrings.h"
+#include "FiniteAutomata.h"
 
 inline std::vector equivalent_regexes = {
     std::pair{"1 + a + aa + aaa + aaaa(a)*", "(a)*"},
@@ -23,6 +23,8 @@ inline std::vector not_equivalent_regexes = {
     std::pair{"(1 + a)(1 + b)(1 + a)", "a + b + ab + ba + aba"},
     std::pair{"ab(a + b)", "aba + abb + aaa"},
     std::pair{"0", "1"},
+    std::pair{"(0)*", "0"},
+    std::pair{"1 + a", "a"},
     std::pair{"0(0 + 1)((1 + 1) + 1)", "1"},
     std::pair{"1(1 + 0)((0 + (0 + 1)) + 0)", "0"},
     std::pair{"a", "ab"}};

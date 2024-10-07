@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "FiniteAutomata.h"
 #include "RegexStrings.h"
+#include "FiniteAutomata.h"
 
 TEST(ComplementTests, test_generated_regex_accepts_same_strings) {
   for (const auto& [regex, correct, incorrect] : regex_strings) {

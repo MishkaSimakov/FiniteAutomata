@@ -2,14 +2,17 @@ add_executable(
         Tests
         regex/RegexParserTests.cpp
         regex/RegexParserTestCase.h
-        finite_automata/NonDeterministicToDeterministicTests.cpp
-        finite_automata/RegexStrings.h
-        finite_automata/RegexStrings.cpp
-        finite_automata/LanguagesEqualityTests.cpp
-        finite_automata/MinimalAutomataTests.cpp
-        finite_automata/ComplementTests.cpp
-        finite_automata/AutomataToRegexTests.cpp
+        weaponry/NonDeterministicToDeterministicTests.cpp
+        RegexStrings.h
+        RegexStrings.cpp
+        weaponry/LanguagesEqualityTests.cpp
+        weaponry/MinimalAutomataTests.cpp
+        weaponry/ComplementTests.cpp
+        weaponry/AutomataToRegexTests.cpp
+        weaponry/NonDeterministicTests.cpp
+        regex/RegexOptimizationTests.cpp
 )
+target_include_directories(Tests PRIVATE .)
 
 set_target_properties(Tests PROPERTIES CMAKE_CXX_FLAGS "-fsanitize=address")
 

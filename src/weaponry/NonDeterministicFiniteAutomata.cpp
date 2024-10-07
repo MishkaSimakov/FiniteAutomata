@@ -4,6 +4,7 @@
 #include <queue>
 
 #include "../CharsetInfo.h"
+#include "FiniteAutomata.h"
 
 struct NonDeterministicFiniteAutomata::FiniteAutomataBuilderVisitor final
     : RegexConstNodeVisitor {
@@ -18,6 +19,7 @@ struct NonDeterministicFiniteAutomata::FiniteAutomataBuilderVisitor final
   }
 
   void visit(const ZeroNode& node) override {}
+
   void visit(const OneNode& node) override {
     auto& start_node = result.get_start_node();
     auto& end_node = result.add_node();
@@ -109,15 +111,15 @@ void NonDeterministicFiniteAutomata::remove_unreachable_nodes() {
 }
 
 NonDeterministicFiniteAutomata::NonDeterministicFiniteAutomata(
-    const Regex& regex) {
-  FiniteAutomataBuilderVisitor visitor;
-  regex.get_root().accept(visitor);
+    const Regex& regex)
+    : nodes_([&regex] {
+        FiniteAutomataBuilderVisitor visitor;
+        regex.get_root().accept(visitor);
 
-  *this = std::move(visitor.result);
-}
+        return std::move(visitor.result.nodes_);
+      }()) {}
 
-bool NonDeterministicFiniteAutomata::containts_word(
-    std::string_view word) const {
+bool NonDeterministicFiniteAutomata::contains(std::string_view word) const {
   std::unordered_set<const Node*> current;
   current.insert(&nodes_.front());
 
@@ -141,10 +143,7 @@ bool NonDeterministicFiniteAutomata::containts_word(
     word.remove_prefix(1);
   }
 
-  do_empty_jumps(current);
-
-  return std::ranges::any_of(current,
-                             [](const Node* node) { return node->is_final; });
+  return do_empty_jumps(current);
 }
 
 void NonDeterministicFiniteAutomata::remove_empty_jumps() {
@@ -153,6 +152,7 @@ void NonDeterministicFiniteAutomata::remove_empty_jumps() {
     nodes.insert(&node);
 
     do_empty_jumps(nodes);
+    nodes.erase(&node);
 
     // add appropriate jumps
     std::vector<std::pair<char, Node*>> additional_jumps;
@@ -177,4 +177,8 @@ void NonDeterministicFiniteAutomata::remove_empty_jumps() {
   }
 
   remove_unreachable_nodes();
+}
+
+Regex NonDeterministicFiniteAutomata::get_regex() const {
+  return FiniteAutomata(*this).get_regex();
 }

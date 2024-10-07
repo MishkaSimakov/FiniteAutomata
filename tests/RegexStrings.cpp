@@ -57,6 +57,11 @@ const auto regex_strings = [] {
           std::vector{"", "a", "b", "aa", "ab", "ba", "bb", "abababababbab"});
 
   result.emplace_back(
+            Regex("(a(a)*b(b)*)*a(a)*"),
+            std::vector{"ababa", "aaaaaba", "abba", "a", "aaaaaa", "aa"},
+            std::vector{"bab", "bbbaaaabbbbaaa", "b", "ba", "ab", "abab", "baba", "baaaaababbbba", "abbbbab"});
+
+  result.emplace_back(
           Regex("(a(a)*b(b)*)*a(a)* + (b(b)*a(a)*)*b(b)* + 1"),
           std::vector{"", "ababa", "aaaaaba", "abba", "baab", "bbbbaaabbbb", "babab", "a", "b", "aaaaaa", "bbbbbbb", "aa", "bb"},
           std::vector{"ba", "ab", "abab", "baba", "baaaaababbbba", "abbbbab"});

@@ -46,11 +46,13 @@ class NonDeterministicFiniteAutomata {
            std::views::filter([](const Node& node) { return node.is_final; });
   }
 
-  bool containts_word(std::string_view word) const;
+  bool contains(std::string_view word) const;
 
   void remove_empty_jumps();
 
   size_t size() const { return nodes_.size(); }
+
+  Regex get_regex() const;
 
   const std::list<Node>& get_nodes() const { return nodes_; }
 
@@ -74,12 +76,8 @@ class NonDeterministicFiniteAutomata {
       }
     };
 
-    // first we process already existing nodes
-    for (const Node* node : nodes) {
-      process_node(node);
-    }
+    std::copy(nodes.begin(), nodes.end(), std::back_inserter(unprocessed));
 
-    // then we process all that stuff that added
     while (!unprocessed.empty()) {
       const Node* current = unprocessed.front();
       unprocessed.pop_front();

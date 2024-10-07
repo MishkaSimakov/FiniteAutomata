@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "FiniteAutomata.h"
 #include "RegexStrings.h"
+#include "FiniteAutomata.h"
 
 TEST(ComplementTests, test_complement_accepts_opposite_strings) {
   for (const auto& [regex, correct, incorrect] : regex_strings) {
@@ -67,5 +67,12 @@ TEST(CompelementTests, test_complement_for_basic_regexes) {
     auto length_gt_one = FiniteAutomata(Regex("(a + b)(a + b)(a + b)*"));
 
     ASSERT_TRUE(length_gt_one.complement().is_language_equal(length_le_one));
+  }
+
+  {
+    auto a = FiniteAutomata(Regex("a"));
+    auto not_a = FiniteAutomata(Regex("1 + a(a + b)(a + b)* + b(a + b)*"));
+
+    ASSERT_TRUE(a.complement().is_language_equal(not_a));
   }
 }

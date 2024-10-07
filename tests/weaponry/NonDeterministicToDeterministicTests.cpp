@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "FiniteAutomata.h"
 #include "RegexStrings.h"
+#include "FiniteAutomata.h"
 
 TEST(NonDeterministicToDeterministicTests, test_it_accepts_same_words) {
   for (const auto& [regex, correct, incorrect] : regex_strings) {
