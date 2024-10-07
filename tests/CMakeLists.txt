@@ -12,6 +12,7 @@ add_executable(
         weaponry/NonDeterministicTests.cpp
         regex/RegexOptimizationTests.cpp
         weaponry/AutomataPrinterTests.cpp
+        cli/FAReaderTests.cpp
 )
 target_include_directories(Tests PRIVATE .)
 

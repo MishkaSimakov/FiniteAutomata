@@ -17,6 +17,10 @@ add_library(FiniteAutomata
         regex/CustomRegex.cpp
         weaponry/parts/DeterministicToMinimal.cpp
         weaponry/parts/AutomataEquivalenceCheck.cpp
+        cli/NonDeterministicFiniteAutomataReader.cpp
+        cli/NonDeterministicFiniteAutomataReader.h
+        cli/FiniteAutomataReader.cpp
+        cli/FiniteAutomataReader.h
 )
 
 target_link_libraries(FiniteAutomata fmt::fmt)
